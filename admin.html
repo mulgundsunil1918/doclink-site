@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Doclink Admin — Service Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --violet:#4A3267;--blush:#DE638A;--pink:#F7B9C4;--mimi:#F3D9E5;--thistle:#C6BADE;
+  --bg:#0d0820;--bg2:#150a2e;--bg3:#1c0e38;
+  --surface:rgba(74,50,103,0.25);--surface-h:rgba(74,50,103,0.42);
+  --border:rgba(198,186,222,0.15);--border-h:rgba(222,99,138,0.4);
+  --text:#F3D9E5;--text-m:rgba(243,217,229,0.65);--text-s:rgba(243,217,229,0.38);
+  --glow:rgba(222,99,138,0.18);
+  --green:#22c55e;--green-bg:rgba(34,197,94,0.12);--green-border:rgba(34,197,94,0.35);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.12);--amber-border:rgba(251,191,36,0.35);
+  --red:#ef4444;--red-bg:rgba(239,68,68,0.12);--red-border:rgba(239,68,68,0.35);
+  --sidebar-w:220px;--r:16px;--tr:0.35s cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ── ORBS ──────────────────────────────── */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);}
+.orb-a{width:500px;height:500px;background:var(--violet);top:-180px;left:-140px;opacity:0.3;animation:drift 20s ease-in-out infinite alternate;}
+.orb-b{width:350px;height:350px;background:var(--blush);bottom:-100px;right:280px;opacity:0.14;animation:drift 16s ease-in-out infinite alternate;animation-delay:-8s;}
+@keyframes drift{from{transform:translate(0,0);}to{transform:translate(40px,30px);}}
+
+/* ── LAYOUT ────────────────────────────── */
+.layout{display:flex;min-height:100vh;position:relative;z-index:1;}
+
+/* ── SIDEBAR ───────────────────────────── */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:rgba(13,8,32,0.92);border-right:1px solid var(--border);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;flex-direction:column;padding:0;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform var(--tr);}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid var(--border);text-decoration:none;}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--violet),var(--blush));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1.05rem;background:linear-gradient(135deg,var(--pink),var(--blush));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-section{padding:16px 12px 8px;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);}
+.sidebar-nav{list-style:none;padding:0 8px;}
+.sidebar-nav li a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--text-m);text-decoration:none;font-size:0.875rem;font-weight:500;transition:background 0.2s,color 0.2s;}
+.sidebar-nav li a:hover,.sidebar-nav li a.active{background:var(--surface);color:var(--text);}
+.sidebar-nav li a.active{border:1px solid var(--border);}
+.sidebar-nav li a svg{width:16px;height:16px;flex-shrink:0;}
+.sidebar-footer{margin-top:auto;padding:16px 12px;border-top:1px solid var(--border);}
+.sidebar-footer a{display:flex;align-items:center;gap:9px;color:var(--text-s);font-size:0.8rem;text-decoration:none;transition:color 0.2s;padding:8px 12px;border-radius:10px;}
+.sidebar-footer a:hover{color:var(--blush);background:var(--surface);}
+
+/* ── MAIN ──────────────────────────────── */
+.main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;}
+
+/* ── TOPBAR ────────────────────────────── */
+.topbar{padding:18px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(13,8,32,0.6);backdrop-filter:blur(16px);position:sticky;top:0;z-index:40;}
+.topbar-left h1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-0.02em;}
+.topbar-left p{font-size:0.8rem;color:var(--text-s);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.overall-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:0.8rem;font-weight:600;}
+.chip-green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.chip-amber{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.chip-red{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.refresh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 16px;color:var(--text-m);font-size:0.82rem;font-weight:500;cursor:pointer;transition:border-color 0.2s,color 0.2s,transform 0.2s;font-family:'Inter',sans-serif;}
+.refresh-btn:hover{border-color:var(--border-h);color:var(--blush);transform:translateY(-1px);}
+.refresh-btn.spinning svg{animation:spin 0.6s linear;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.last-updated{font-size:0.75rem;color:var(--text-s);}
+
+/* ── CONTENT ───────────────────────────── */
+.content{padding:28px 32px;flex:1;}
+
+/* ── SUMMARY ROW ───────────────────────── */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;backdrop-filter:blur(16px);}
+.summary-card .sc-label{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);margin-bottom:8px;}
+.summary-card .sc-num{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.04em;line-height:1;}
+.summary-card .sc-sub{font-size:0.78rem;color:var(--text-s);margin-top:4px;}
+.sc-green .sc-num{color:var(--green);}
+.sc-amber .sc-num{color:var(--amber);}
+.sc-red .sc-num{color:var(--red);}
+.sc-blue .sc-num{background:linear-gradient(135deg,var(--pink),var(--blush));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── SERVICES GRID ─────────────────────── */
+.section-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-0.01em;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.section-title span{font-size:0.75rem;font-weight:500;color:var(--text-s);}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.svc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;backdrop-filter:blur(16px);transition:border-color var(--tr),transform var(--tr);position:relative;overflow:hidden;}
+.svc-card:hover{transform:translateY(-2px);}
+.svc-card.status-ok{border-left:3px solid var(--green);}
+.svc-card.status-warn{border-left:3px solid var(--amber);}
+.svc-card.status-err{border-left:3px solid var(--red);}
+.svc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.svc-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;}
+.svc-tag{font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-s);margin-top:3px;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;flex-shrink:0;}
+.badge-ok{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.badge-warn{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.badge-err{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-ok{background:var(--green);animation:blink 2.5s ease-in-out infinite;}
+.dot-warn{background:var(--amber);animation:blink 1.5s ease-in-out infinite;}
+.dot-err{background:var(--red);animation:blink 0.9s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.svc-meta{display:flex;align-items:center;justify-content:space-between;}
+.svc-resp{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--text-m);}
+.svc-uptime{font-size:0.75rem;color:var(--text-s);}
+.resp-bar-wrap{margin-top:12px;}
+.resp-bar-track{height:3px;background:rgba(198,186,222,0.1);border-radius:3px;overflow:hidden;}
+.resp-bar-fill{height:100%;border-radius:3px;transition:width 0.8s ease;}
+.bar-ok{background:linear-gradient(90deg,var(--green),rgba(34,197,94,0.5));}
+.bar-warn{background:linear-gradient(90deg,var(--amber),rgba(251,191,36,0.5));}
+.bar-err{background:rgba(239,68,68,0.4);}
+
+/* ── TWO-COL BOTTOM ─────────────────────── */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+/* ── RESPONSE CHART ─────────────────────── */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;backdrop-filter:blur(16px);}
+.chart-bars{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.chart-row{display:grid;grid-template-columns:160px 1fr 60px;align-items:center;gap:10px;}
+.chart-label{font-size:0.8rem;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chart-bar-track{height:8px;background:rgba(198,186,222,0.08);border-radius:4px;overflow:hidden;}
+.chart-bar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+.chart-val{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-m);text-align:right;}
+
+/* ── INCIDENT LOG ───────────────────────── */
+.incident-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;backdrop-filter:blur(16px);}
+.incident-list{display:flex;flex-direction:column;gap:0;margin-top:16px;}
+.incident{padding:14px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.incident:last-child{border-bottom:none;padding-bottom:0;}
+.inc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.inc-body{flex:1;}
+.inc-title{font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.inc-time{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-s);}
+.inc-tag{display:inline-block;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+.tag-resolved{background:var(--green-bg);color:var(--green);}
+.tag-investigating{background:var(--amber-bg);color:var(--amber);}
+.tag-active{background:var(--red-bg);color:var(--red);}
+
+/* ── MOBILE ─────────────────────────────── */
+.mob-header{display:none;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(13,8,32,0.95);position:sticky;top:0;z-index:60;}
+.mob-menu-btn{background:none;border:none;color:var(--text-m);cursor:pointer;padding:4px;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:45;backdrop-filter:blur(4px);}
+.sidebar-overlay.show{display:block;}
+
+@media(max-width:1100px){
+  .services-grid{grid-template-columns:1fr 1fr;}
+  .summary-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .mob-header{display:flex;}
+  .topbar{padding:14px 16px;top:57px;}
+  .content{padding:16px;}
+  .services-grid{grid-template-columns:1fr;}
+  .summary-row{grid-template-columns:1fr 1fr;}
+  .bottom-row{grid-template-columns:1fr;}
+  .chart-row{grid-template-columns:120px 1fr 50px;}
+}
+@media(max-width:480px){
+  .summary-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="orbs">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+</div>
+
+<!-- MOBILE HEADER -->
+<div class="mob-header">
+  <button class="mob-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1rem;background:linear-gradient(135deg,#F7B9C4,#DE638A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Doclink Admin</span>
+  <div id="mob-overall" class="overall-chip chip-amber" style="font-size:0.72rem;padding:6px 10px;">Degraded</div>
+</div>
+
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 100 100" fill="none" style="width:18px;height:18px;">
+          <rect x="10" y="18" width="32" height="56" rx="9" fill="rgba(255,255,255,0.9)"/>
+          <rect x="58" y="18" width="32" height="56" rx="9" fill="rgba(255,255,255,0.9)"/>
+          <line x1="42" y1="50" x2="58" y2="50" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-name">Doclink</span>
+    </a>
+
+    <div class="sidebar-section">Monitoring</div>
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </a></li>
+      <li><a href="#services">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Services
+      </a></li>
+      <li><a href="#incidents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Incidents
+      </a></li>
+      <li><a href="#response">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Response Times
+      </a></li>
+    </ul>
+
+    <div class="sidebar-section">System</div>
+    <ul class="sidebar-nav">
+      <li><a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Settings
+      </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="index.html">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Service Health Monitor</h1>
+        <p>Doclink infrastructure · Real-time status</p>
+      </div>
+      <div class="topbar-right">
+        <div id="overall-chip" class="overall-chip chip-amber">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--amber);animation:blink 1.5s infinite;"></span>
+          Partially Degraded
+        </div>
+        <button class="refresh-btn" onclick="refresh()" id="refreshBtn">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" id="refreshIcon"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
+        <span class="last-updated" id="lastUpdated">Updated just now</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- SUMMARY ROW -->
+      <div class="summary-row">
+        <div class="summary-card sc-green">
+          <div class="sc-label">Operational</div>
+          <div class="sc-num" id="count-ok">9</div>
+          <div class="sc-sub">services running normally</div>
+        </div>
+        <div class="summary-card sc-amber">
+          <div class="sc-label">Degraded</div>
+          <div class="sc-num" id="count-warn">2</div>
+          <div class="sc-sub">services with issues</div>
+        </div>
+        <div class="summary-card sc-red">
+          <div class="sc-label">Major Outage</div>
+          <div class="sc-num" id="count-err">1</div>
+          <div class="sc-sub">services down</div>
+        </div>
+        <div class="summary-card sc-blue">
+          <div class="sc-label">Avg Response</div>
+          <div class="sc-num">148ms</div>
+          <div class="sc-sub">across all healthy services</div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div id="services">
+        <div class="section-title">
+          Services
+          <span id="services-ts">12 services monitored</span>
+        </div>
+        <div class="services-grid" id="svcGrid">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+
+        <!-- RESPONSE TIMES -->
+        <div id="response">
+          <div class="section-title">Response Times</div>
+          <div class="chart-card">
+            <div class="chart-bars" id="chartBars">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- INCIDENTS -->
+        <div id="incidents">
+          <div class="section-title">Recent Incidents</div>
+          <div class="incident-card">
+            <div class="incident-list">
+              <div class="incident">
+                <div class="inc-dot" style="background:var(--red);animation:blink 0.9s infinite;"></div>
+                <div class="inc-body">
+                  <div class="inc-title">Telemedicine Server — Major Outage <span class="inc-tag tag-active">Active</span></div>
+                  <div class="inc-time">2026-05-17 · 18:32 IST — Investigating. Video relay nodes unreachable. Team notified.</div>
+                </div>
+              </div>
+              <div class="incident">
+                <div class="inc-dot" style="background:var(--amber);animation:blink 1.5s infinite;"></div>
+                <div class="inc-body">
+                  <div class="inc-title">AI Proxy — Elevated Latency <span class="inc-tag tag-investigating">Monitoring</span></div>
+                  <div class="inc-time">2026-05-17 · 14:10 IST — Groq API response times elevated. Fallback model active.</div>
+                </div>
+              </div>
+              <div class="incident">
+                <div class="inc-dot" style="background:var(--amber);"></div>
+                <div class="inc-body">
+                  <div class="inc-title">Analytics Pipeline — Data Delay <span class="inc-tag tag-investigating">Monitoring</span></div>
+                  <div class="inc-time">2026-05-17 · 11:45 IST — Analytics events delayed by ~8 min. Root cause identified.</div>
+                </div>
+              </div>
+              <div class="incident">
+                <div class="inc-dot" style="background:var(--green);"></div>
+                <div class="inc-body">
+                  <div class="inc-title">Supabase DB — Slow Queries <span class="inc-tag tag-resolved">Resolved</span></div>
+                  <div class="inc-time">2026-05-16 · 09:12 IST — Index rebuild caused slow queries for 22 min. Resolved 09:34.</div>
+                </div>
+              </div>
+              <div class="incident">
+                <div class="inc-dot" style="background:var(--green);"></div>
+                <div class="inc-body">
+                  <div class="inc-title">Auth Service — JWT Expiry Issue <span class="inc-tag tag-resolved">Resolved</span></div>
+                  <div class="inc-time">2026-05-14 · 22:05 IST — Some tokens expired early due to clock skew. Patched 22:41.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /bottom-row -->
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+// ── Service definitions ──────────────────────────────────────────
+const SERVICES = [
+  {id:'api',      name:'API Gateway',          tag:'Infrastructure',   status:'ok',   resp:42,   uptime:'99.98%'},
+  {id:'db',       name:'Supabase Database',    tag:'Storage',          status:'ok',   resp:67,   uptime:'99.95%'},
+  {id:'auth',     name:'Authentication',       tag:'Security',         status:'ok',   resp:38,   uptime:'99.99%'},
+  {id:'ai',       name:'AI Proxy',             tag:'Edge Functions',   status:'warn', resp:1240, uptime:'98.2%'},
+  {id:'storage',  name:'File Storage',         tag:'Storage',          status:'ok',   resp:95,   uptime:'99.97%'},
+  {id:'fcm',      name:'Push Notifications',   tag:'Firebase FCM',     status:'ok',   resp:120,  uptime:'99.93%'},
+  {id:'pay',      name:'Payment Gateway',      tag:'Razorpay',         status:'ok',   resp:180,  uptime:'99.91%'},
+  {id:'cdn',      name:'CDN / Assets',         tag:'Infrastructure',   status:'ok',   resp:22,   uptime:'100%'},
+  {id:'tele',     name:'Telemedicine Server',  tag:'Video Relay',      status:'err',  resp:null, uptime:'94.1%'},
+  {id:'analytics',name:'Analytics Pipeline',   tag:'Data',             status:'warn', resp:340,  uptime:'97.8%'},
+  {id:'email',    name:'Email Service',        tag:'Notifications',    status:'ok',   resp:88,   uptime:'99.89%'},
+  {id:'dist',     name:'App Distribution',     tag:'Stores',           status:'ok',   resp:null, uptime:'100%'},
+];
+
+const MAX_RESP = 1400;
+
+function statusClass(s){ return s==='ok'?'status-ok':s==='warn'?'status-warn':'status-err'; }
+function badgeClass(s)  { return s==='ok'?'badge-ok':s==='warn'?'badge-warn':'badge-err'; }
+function dotClass(s)    { return s==='ok'?'dot-ok':s==='warn'?'dot-warn':'dot-err'; }
+function barClass(s)    { return s==='ok'?'bar-ok':s==='warn'?'bar-warn':'bar-err'; }
+function statusLabel(s) { return s==='ok'?'Operational':s==='warn'?'Degraded':'Outage'; }
+function respLabel(r)   { return r?r+'ms':'—'; }
+function barWidth(r,s)  {
+  if(s==='err') return 0;
+  if(!r) return 100;
+  return Math.max(4, Math.round((1-(r/MAX_RESP))*100));
+}
+
+function renderGrid(){
+  const grid = document.getElementById('svcGrid');
+  grid.innerHTML = SERVICES.map(s=>`
+    <div class="svc-card ${statusClass(s.status)}" id="svc-${s.id}">
+      <div class="svc-header">
+        <div>
+          <div class="svc-name">${s.name}</div>
+          <div class="svc-tag">${s.tag}</div>
+        </div>
+        <div class="status-badge ${badgeClass(s.status)}">
+          <span class="status-dot ${dotClass(s.status)}"></span>
+          ${statusLabel(s.status)}
+        </div>
+      </div>
+      <div class="resp-bar-wrap">
+        <div class="resp-bar-track">
+          <div class="resp-bar-fill ${barClass(s.status)}" style="width:${barWidth(s.resp,s.status)}%"></div>
+        </div>
+      </div>
+      <div class="svc-meta" style="margin-top:10px;">
+        <span class="svc-resp">${respLabel(s.resp)}</span>
+        <span class="svc-uptime">↑ ${s.uptime}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderChart(){
+  const bars = document.getElementById('chartBars');
+  const measurable = SERVICES.filter(s=>s.resp&&s.status!=='err');
+  bars.innerHTML = measurable.map(s=>`
+    <div class="chart-row">
+      <div class="chart-label" title="${s.name}">${s.name}</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill ${barClass(s.status)}" style="width:${barWidth(s.resp,s.status)}%"></div>
+      </div>
+      <div class="chart-val">${s.resp}ms</div>
+    </div>
+  `).join('');
+}
+
+function updateCounts(){
+  const ok   = SERVICES.filter(s=>s.status==='ok').length;
+  const warn = SERVICES.filter(s=>s.status==='warn').length;
+  const err  = SERVICES.filter(s=>s.status==='err').length;
+  document.getElementById('count-ok').textContent   = ok;
+  document.getElementById('count-warn').textContent  = warn;
+  document.getElementById('count-err').textContent   = err;
+
+  const chip = document.getElementById('overall-chip');
+  const mob  = document.getElementById('mob-overall');
+  if(err>0){
+    chip.className='overall-chip chip-red';
+    chip.innerHTML='<span style="width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 0.9s infinite;"></span> Partial Outage';
+    if(mob){mob.className='overall-chip chip-red';mob.textContent='Outage';}
+  } else if(warn>0){
+    chip.className='overall-chip chip-amber';
+    chip.innerHTML='<span style="width:7px;height:7px;border-radius:50%;background:var(--amber);animation:blink 1.5s infinite;"></span> Partially Degraded';
+    if(mob){mob.className='overall-chip chip-amber';mob.textContent='Degraded';}
+  } else {
+    chip.className='overall-chip chip-green';
+    chip.innerHTML='<span style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2.5s infinite;"></span> All Systems Operational';
+    if(mob){mob.className='overall-chip chip-green';mob.textContent='Operational';}
+  }
+}
+
+function setLastUpdated(){
+  const now = new Date();
+  document.getElementById('lastUpdated').textContent =
+    'Updated ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function render(){
+  renderGrid();
+  renderChart();
+  updateCounts();
+  setLastUpdated();
+}
+
+// ── Auto-simulation: fluctuate one service every 30s ────────────
+function simulate(){
+  // Randomly pick a non-critical service and nudge its response time / status
+  const candidates = [0,4,5,6,7,10]; // non-outage indices
+  const i = candidates[Math.floor(Math.random()*candidates.length)];
+  const s = SERVICES[i];
+  // Small response time jitter
+  if(s.resp){
+    const delta = Math.round((Math.random()-0.5)*30);
+    s.resp = Math.max(15, s.resp+delta);
+  }
+  render();
+}
+
+// ── Refresh button ───────────────────────────────────────────────
+function refresh(){
+  const btn  = document.getElementById('refreshBtn');
+  const icon = document.getElementById('refreshIcon');
+  btn.classList.add('spinning');
+  setTimeout(()=>{
+    simulate();
+    btn.classList.remove('spinning');
+  }, 600);
+}
+
+// ── Sidebar mobile toggle ────────────────────────────────────────
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+render();
+setInterval(simulate, 30000);
+</script>
+</body>
+</html>
