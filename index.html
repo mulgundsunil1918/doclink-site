@@ -198,33 +198,86 @@ footer p{font-size:0.8rem;color:var(--text-s);}
   nav{padding:12px 24px;}
   .nav-links{display:none;}
   .hamburger{display:flex;}
+  .nav-cta{display:none;}
   .section{padding:72px 20px;}
-  .reality-big{grid-template-columns:1fr;gap:28px;padding:32px 28px;}
-  .reality-stat{text-align:left;}
+  .reality-big{grid-template-columns:1fr;gap:24px;padding:28px 24px;}
+  .reality-stat{text-align:left;display:flex;align-items:center;gap:20px;}
+  .reality-label{margin-top:0;}
   .currently-grid{grid-template-columns:1fr;}
-  .steps-wrap{grid-template-columns:1fr;gap:36px;}
+  .steps-wrap{grid-template-columns:1fr;gap:32px;}
   .steps-wrap::before{display:none;}
   .feat-grid{grid-template-columns:1fr 1fr;}
-  .about-wrap{grid-template-columns:1fr;gap:28px;}
-  .pricing-grid{grid-template-columns:1fr;}
-  .compare-head,.compare-row{grid-template-columns:2fr 1fr 1fr 1fr;font-size:0.8rem;}
+  .about-wrap{grid-template-columns:1fr;gap:24px;}
+  .pricing-grid{grid-template-columns:1fr;max-width:480px;}
+  .compare-head,.compare-row{grid-template-columns:2fr 1fr 1fr 1fr;}
+  .compare-head div,.compare-row div{font-size:0.8rem;}
 }
+
 @media(max-width:600px){
-  nav{padding:10px 16px;}
-  #hero{padding:100px 16px 60px;}
-  .hero-proof{flex-direction:column;gap:10px;}
+  nav{padding:10px 14px;}
+  #hero{padding:90px 16px 52px;min-height:100svh;}
+  .hero-badge{font-size:0.68rem;padding:6px 14px;margin-bottom:24px;}
+  .hero-h1{font-size:clamp(2rem,10vw,2.5rem);margin-bottom:16px;}
+  .hero-sub{font-size:0.92rem;line-height:1.72;margin-bottom:32px;}
+  .hero-actions{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:40px;}
+  .btn-p,.btn-s{justify-content:center;padding:14px 24px;font-size:0.95rem;}
+  .hero-proof{flex-direction:column;gap:8px;align-items:flex-start;}
   .proof-divider{display:none;}
-  .hero-actions{flex-direction:column;align-items:stretch;}
-  .btn-p,.btn-s{justify-content:center;}
+
+  .section{padding:52px 16px;}
+  .s-title{font-size:clamp(1.7rem,7vw,2.4rem);}
+  .s-sub{font-size:0.92rem;}
+
+  /* Reality */
+  .reality-big{padding:20px 16px;gap:18px;}
+  .reality-num{font-size:3.2rem;}
+  .reality-text p{font-size:0.92rem;line-height:1.72;}
+  .currently-card{padding:20px 16px;}
+
+  /* Steps */
+  .step{padding:0 4px;}
+  .step-num{width:68px;height:68px;font-size:1.6rem;border-radius:20px;}
+  .step-desc{font-size:0.85rem;}
+
+  /* Features */
   .feat-grid{grid-template-columns:1fr;}
+  .feat-card{padding:22px 18px;}
+
+  /* Comparison — inline app labels so values have context */
   .compare-head{display:none;}
-  .compare-row{grid-template-columns:1fr;gap:4px;padding:16px;}
-  .compare-row div{text-align:left;}
-  .compare-row div:first-child{font-weight:600;color:var(--text);margin-bottom:8px;}
-  footer{padding:24px 16px;flex-direction:column;text-align:center;}
-  .footer-links{justify-content:center;}
-  .about-left{padding:28px;}
-  .pricing-card{padding:28px;}
+  .compare-row{display:block;padding:14px 16px;border-bottom:1px solid var(--border);}
+  .compare-row:last-child{border-bottom:none;}
+  .compare-row div:first-child{font-weight:600;color:var(--text);font-size:0.875rem;display:block;margin-bottom:10px;}
+  .compare-row div:not(:first-child){display:inline-flex;align-items:center;gap:3px;font-size:0.82rem;margin-right:14px;margin-bottom:0;}
+  .compare-row div:nth-child(2)::before{content:"Doclink\00a0";color:var(--blush);font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
+  .compare-row div:nth-child(3)::before{content:"Practo\00a0";color:var(--text-s);font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+  .compare-row div:nth-child(4)::before{content:"WA\00a0";color:var(--text-s);font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+
+  /* About */
+  .about-wrap{gap:20px;}
+  .about-left{padding:20px 18px;}
+  .about-avatar{width:56px;height:56px;font-size:1.6rem;border-radius:14px;}
+  .about-name{font-size:1.15rem;}
+
+  /* Pricing */
+  .pricing-grid{max-width:100%;}
+  .pricing-card{padding:24px 18px;}
+  .plan-price{font-size:2rem;}
+
+  /* Footer */
+  footer{padding:24px 16px;flex-direction:column;align-items:center;text-align:center;gap:14px;}
+  .footer-links{justify-content:center;gap:14px;}
+  footer p{font-size:0.75rem;}
+}
+
+@media(max-width:390px){
+  .hero-h1{font-size:1.9rem;}
+  .s-title{font-size:1.65rem;}
+  .reality-num{font-size:2.8rem;}
+  .step-num{width:60px;height:60px;font-size:1.4rem;}
+  .btn-p,.btn-s{padding:13px 18px;font-size:0.9rem;}
+  .pricing-card{padding:20px 14px;}
+  .currently-card{padding:16px 14px;}
 }
 </style>
 </head>
