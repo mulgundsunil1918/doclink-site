@@ -22,6 +22,7 @@
   --shadow:0 4px 32px rgba(0,0,0,0.5);
   --r:22px;--tr:0.4s cubic-bezier(0.16,1,0.3,1);
   --green:#22c55e;--amber:#fbbf24;
+  --dev-h:46px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -35,8 +36,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .orb-c{width:380px;height:380px;background:var(--pink);top:42%;left:52%;opacity:0.1;animation-delay:-13s;}
 @keyframes drift{from{transform:translate(0,0) scale(1);}to{transform:translate(50px,35px) scale(1.1);}}
 
+/* ── DEV BANNER ───────────────────────────────── */
+.dev-banner{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--dev-h);display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(90deg,#78350f,#92400e,#78350f);border-bottom:1px solid rgba(251,191,36,0.35);padding:0 16px;}
+.dev-banner-text{font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;color:#fde68a;letter-spacing:0.02em;text-align:center;line-height:1.4;}
+.dev-banner-text strong{color:#fef3c7;}
+.dev-banner-icon{font-size:1rem;flex-shrink:0;}
+@media(max-width:600px){
+  .dev-banner{height:auto;min-height:var(--dev-h);padding:8px 14px;}
+  .dev-banner-text{font-size:0.72rem;}
+}
+
 /* ── NAV ──────────────────────────────────────── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 48px;background:var(--nav-bg);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);}
+nav{position:fixed;top:var(--dev-h);left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 48px;background:var(--nav-bg);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
 .nav-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--blush));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-logo-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1.25rem;background:linear-gradient(135deg,var(--pink),var(--blush));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -54,7 +65,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .mobile-menu a:hover{color:var(--blush);}
 
 /* ── HERO ─────────────────────────────────────── */
-#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 80px;}
+#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(140px + var(--dev-h)) 24px 80px;}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 18px;font-size:0.75rem;font-weight:600;color:var(--blush);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:36px;backdrop-filter:blur(10px);animation:fadeUp 0.8s ease both;}
 .badge-dot{width:6px;height:6px;background:var(--blush);border-radius:50%;animation:pulse 2s ease infinite;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.5);}}
@@ -178,6 +189,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .plan-cta.secondary{background:var(--surface-h);color:var(--text);border:1px solid var(--border);}
 .plan-cta.secondary:hover{transform:translateY(-2px);border-color:var(--border-h);}
 
+/* ── FLOATING CONTACT BUTTON ──────────────────── */
+.contact-fab{position:fixed;bottom:28px;right:28px;z-index:150;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--blush),#b83a62);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.88rem;padding:13px 22px;border-radius:50px;box-shadow:0 6px 28px rgba(222,99,138,0.45);text-decoration:none;border:none;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;white-space:nowrap;}
+.contact-fab:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 36px rgba(222,99,138,0.55);}
+.contact-fab svg{flex-shrink:0;}
+@media(max-width:600px){
+  .contact-fab{bottom:18px;right:16px;padding:11px 18px;font-size:0.82rem;}
+}
+
 /* ── FOOTER ───────────────────────────────────── */
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
 .footer-logo{display:flex;align-items:center;gap:10px;text-decoration:none;opacity:0.6;transition:opacity 0.2s;}
@@ -282,6 +301,13 @@ footer p{font-size:0.8rem;color:var(--text-s);}
 </style>
 </head>
 <body>
+
+<!-- DEV MODE BANNER -->
+<div class="dev-banner">
+  <span class="dev-banner-icon">🚧</span>
+  <p class="dev-banner-text"><strong>This app is currently in development.</strong> Features may be incomplete or change without notice. Not intended for clinical use.</p>
+  <span class="dev-banner-icon">🚧</span>
+</div>
 
 <div class="orbs">
   <div class="orb orb-a"></div>
@@ -679,6 +705,12 @@ footer p{font-size:0.8rem;color:var(--text-s);}
   </div>
   <p>© 2025 Dr. Sunil Mulgund · Doclink · Built with purpose</p>
 </footer>
+
+<!-- FLOATING CONTACT BUTTON -->
+<a href="mailto:mulgundsunil@gmail.com?subject=Doclink%20Feedback%20%2F%20Support&body=Hi%20Dr.%20Sunil%2C%0A%0AI%20have%20a%20suggestion%20%2F%20question%20about%20Doclink%3A%0A%0A" class="contact-fab">
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Contact &amp; Suggestions
+</a>
 
 <script>
 function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); }
